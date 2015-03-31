@@ -9,14 +9,16 @@ bot = SimpleIRC.IRCConnection()
 
 bot.streams = []
 bot.recordings = []
+bot.upcoming = []
 
-public_help_messages = ["Hello! I'm WatchCode. I help people find programming streams on IRC. Here's the command list.", "!help, !streams, !recording"]
+public_help_messages = ["Hello! I'm WatchCode. I help people find programming streams on IRC. Here's the command list.", "!help, !streams, !recording, !upcoming"]
 
 private_help_messages = [
     "Here's more information about the bot and the commands.",
     "!help - Prints these lines",
     "!streams - Prints the current streams",
-    "!recording - Gives a random recording"
+    "!recording - Gives a random recording",
+    "!upcoming - Prints the upcoming streams"
 ]
 
 def on_connect(bot):
@@ -49,6 +51,18 @@ def on_message(bot, channel, sender, message):
         random_recording = random.choice(bot.recordings)
         bot.send_message(channel, "Here's your recording {}.".format(sender))
         bot.send_message(channel, "\"{}\" by {}: {}".format(random_recording["title"], random_recording["username"], random_recording["url"]))
+    elif message.split()[0] == "!upcoming":
+        if len(bot.upcoming) > 0:
+            bot.send_message(channel, "Here are the upcoming streams {}.".format(sender))
+            for stream in bot.upcoming:
+                bot.send_message(channel, "\"{}\" by {}: {}".format(stream["title"], stream["username"], stream["url"]))
+        else:
+            if len(bot.streams) > 0:
+                bot.send_message(channel, "There are no upcoming streams, but there are {} live streams.".format(len(bot.streams)))
+            else:
+                random_recording = random.choice(bot.recordings)
+                bot.send_message(channel, "There are no upcoming or live streams at the moment. How about a random recording?".format(sender))
+                bot.send_message(channel, "\"{}\" by {}: {}".format(random_recording["title"], random_recording["username"], random_recording["url"]))
     elif message.split()[0] == "!help":
         for message_line in public_help_messages:
             bot.send_message(channel, message_line)
@@ -60,6 +74,7 @@ def thread(bot):
         try:
             json_response = requests.get("http://watchpeoplecode.com/json").json()
             bot.recordings = json_response["completed"]
+            bot.upcoming = json_response["upcoming"]
             new_streams =  json_response["live"]
 
             for stream in new_streams:
