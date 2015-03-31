@@ -75,24 +75,6 @@ def thread(bot):
         except Exception as error:
             bot.send_message("#WatchPeopleCode", "gkbrk: Help me father! {}".format(error))
 
-def thread_old(bot):
-    while True:
-        try:
-            json_response = requests.get("http://watchpeoplecode.com/json").json()
-            bot.recordings = json_response["completed"]
-            new_streams =  json_response["live"]
-            new_streams = [{"title": x["title"], "url": x["url"], "username": x["username"]} for x in new_streams]
-            if bot.streams == new_streams:
-                bot.streams = new_streams
-            else:
-                for new_stream in list(set([json.dumps(x) for x in new_streams]) - set([json.dumps(x) for x in bot.streams])):
-                    new_stream = json.loads(new_stream)
-                    bot.send_message("#WatchPeopleCode", "{} is now live. Go watch their stream called \"{}\" on {}.".format(new_stream["username"], new_stream["title"], new_stream["url"]))
-                bot.streams = new_streams
-            time.sleep(30)
-        except requests.exceptions.RequestException as error:
-            bot.send_message("#WatchPeopleCode", "gkbrk: Help me father! {}".format(error))
-
 bot.on_connect.append(on_connect)
 bot.on_welcome.append(on_welcome)
 bot.on_public_message.append(on_message)
