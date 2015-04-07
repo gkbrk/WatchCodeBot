@@ -86,9 +86,9 @@ def thread(bot):
                     bot.send_message("#WatchPeopleCode", "{} is now live. Go watch their stream called \"{}\" on {}.".format(stream["username"], stream["title"], stream["url"]))
 
             bot.streams = new_streams
-            time.sleep(30)
         except Exception as error:
             bot.send_message("#WatchPeopleCode", "gkbrk: Help me father! {}".format(error))
+        time.sleep(30)
 
 bot.on_connect.append(on_connect)
 bot.on_welcome.append(on_welcome)
