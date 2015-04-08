@@ -7,6 +7,9 @@ import random
 
 bot = SimpleIRC.IRCConnection()
 
+with open("config.json") as config_file:
+    config = json.loads(config_file.read())
+
 bot.streams = []
 bot.recordings = []
 bot.upcoming = []
@@ -22,13 +25,13 @@ private_help_messages = [
 ]
 
 def on_connect(bot):
-    bot.set_nick("WatchCode")
-    bot.send_user_packet("WatchCodeBot")
+    bot.set_nick(config["nick"])
+    bot.send_user_packet(config["username"])
 
 def on_welcome(bot):
     bot.send_message("NickServ", "identify {}".format(open("irc_pass.txt").read()))
-    bot.join_channel("#WatchPeopleCode")
-    bot.join_channel("#WatchCodeTest")
+    for channel in config["channels"]:
+        bot.join_channel(channel)
 
     th = threading.Thread(target=thread, kwargs={"bot": bot})
     th.daemon = True
@@ -83,18 +86,19 @@ def thread(bot):
                     if stream["title"] == known_stream["title"] and stream["url"] == known_stream["url"] and stream["username"] == known_stream["username"]:
                         is_match_found = True
                 if not is_match_found:
-                    bot.send_message("#WatchPeopleCode", "{} is now live. Go watch their stream called \"{}\" on {}.".format(stream["username"], stream["title"], stream["url"]))
+                    for channel in config["channels"]:
+                        bot.send_message(channel, "{} is now live. Go watch their stream called \"{}\" on {}.".format(stream["username"], stream["title"], stream["url"]))
 
             bot.streams = new_streams
         except Exception as error:
-            bot.send_message("#WatchPeopleCode", "gkbrk: Help me father! {}".format(error))
+            with open("errorlog.txt", "w") as error_file:
+                error_file.write(error)
+            bot.send_message("gkbrk", "Help me father! {}".format(error))
         time.sleep(30)
 
 bot.on_connect.append(on_connect)
 bot.on_welcome.append(on_welcome)
 bot.on_public_message.append(on_message)
-
-bot.on_packet_received.append(lambda bot, packet: print(packet.command, packet.arguments, packet.prefix))
 
 bot.connect("irc.freenode.net")
 
