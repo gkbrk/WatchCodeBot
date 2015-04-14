@@ -5,6 +5,9 @@ import time
 import threading
 import random
 
+def get_date_time():
+    return time.strftime("[%d-%m-%Y %H:%M]")
+
 bot = SimpleIRC.IRCConnection()
 
 with open("config.json") as config_file:
@@ -13,6 +16,8 @@ with open("config.json") as config_file:
 bot.streams = []
 bot.recordings = []
 bot.upcoming = []
+
+bot.muted = False
 
 public_help_messages = ["Hello! I'm WatchCode. I help people find programming streams on IRC. Here's the command list.", "!help, !streams, !recording, !upcoming"]
 
@@ -71,6 +76,16 @@ def on_message(bot, channel, sender, message):
             bot.send_message(channel, message_line)
         for message_line in private_help_messages:
             bot.send_message(sender, message_line)
+    elif message.split()[0] == "!mute":
+        bot.muted = not bot.muted
+        prefix = ""
+        if not bot.muted:
+            prefix = "un"
+        bot.send_message(channel, "I am {}muted now, {}.".format(prefix, sender))
+        with open("mutes.txt", "a") as mute_file:
+            mute_file.write("{} {} {}\n".format(get_date_time(), bot.muted, sender))
+    elif message.split()[0] == "!shoot" and len(message.split()) > 1:
+        bot.send_message(channel, "▄︻̷̿┻̿═━一 {} pew pew".format(message.split()[1]))
 
 def thread(bot):
     while True:
@@ -86,13 +101,14 @@ def thread(bot):
                     if stream["title"] == known_stream["title"] and stream["url"] == known_stream["url"] and stream["username"] == known_stream["username"]:
                         is_match_found = True
                 if not is_match_found:
-                    for channel in config["channels"]:
-                        bot.send_message(channel, "{} is now live. Go watch their stream called \"{}\" on {}.".format(stream["username"], stream["title"], stream["url"]))
+                    if not bot.muted:
+                        for channel in config["channels"]:
+                            bot.send_message(channel, "{} is now live. Go watch their stream called \"{}\" on {}.".format(stream["username"], stream["title"], stream["url"]))
 
             bot.streams = new_streams
         except Exception as error:
-            with open("errorlog.txt", "w") as error_file:
-                error_file.write(error)
+            with open("errorlog.txt", "a") as error_file:
+                error_file.write("{} {}\n".format(get_date_time(), error))
             bot.send_message("gkbrk", "Help me father! {}".format(error))
         time.sleep(30)
 
