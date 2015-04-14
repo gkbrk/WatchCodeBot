@@ -1,4 +1,4 @@
-import SimpleIRC
+import JustIRC
 import requests
 import json
 import time
@@ -8,7 +8,7 @@ import random
 def get_date_time():
     return time.strftime("[%d-%m-%Y %H:%M]")
 
-bot = SimpleIRC.IRCConnection()
+bot = JustIRC.IRCConnection()
 
 with open("config.json") as config_file:
     config = json.loads(config_file.read())
