@@ -62,8 +62,8 @@ def on_message(bot, channel, sender, message):
             bot.send_message(channel, "\"{}\" by {}: {}".format(random_recording["title"], random_recording["username"], random_recording["url"]))
         else:
             for recording in bot.recordings:
-                if message.split()[1] in recording["title"] or message.split()[1] in recording["username"]:
-                    bot.send_message(channel, "\"{}\" by {}: {}".format(recording["title"], recording["username"]))
+                if " ".join(message.split()[1:]) in recording["title"].lower():
+                    bot.send_message(channel, "\"{}\" by {}: {}".format(recording["title"], recording["username"], recording["url"]))
                     break
     elif message.split()[0] == "!upcoming":
         if len(bot.upcoming) > 0:
