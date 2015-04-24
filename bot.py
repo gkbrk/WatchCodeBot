@@ -56,9 +56,15 @@ def on_message(bot, channel, sender, message):
             bot.send_message(channel, "There are no streams at the moment {}. How about a random recording?".format(sender))
             bot.send_message(channel, "\"{}\" by {}: {}".format(random_recording["title"], random_recording["username"], random_recording["url"]))
     elif message.split()[0] == "!recording":
-        random_recording = random.choice(bot.recordings)
-        bot.send_message(channel, "Here's your recording {}.".format(sender))
-        bot.send_message(channel, "\"{}\" by {}: {}".format(random_recording["title"], random_recording["username"], random_recording["url"]))
+        if len(message.split()) == 1:
+            random_recording = random.choice(bot.recordings)
+            bot.send_message(channel, "Here's your recording {}.".format(sender))
+            bot.send_message(channel, "\"{}\" by {}: {}".format(random_recording["title"], random_recording["username"], random_recording["url"]))
+        else:
+            for recording in bot.recordings:
+                if message.split()[1] in recording["title"] or recording["username"]:
+                    bot.send_message(channel, "\"{}\" by {}: {}".format(recording["title"], recording["username"]))
+                    break
     elif message.split()[0] == "!upcoming":
         if len(bot.upcoming) > 0:
             bot.send_message(channel, "Here are the upcoming streams {}.".format(sender))
