@@ -103,7 +103,7 @@ def thread(bot):
                 if not is_match_found:
                     if not bot.muted:
                         for channel in config["channels"]:
-                            bot.send_message(channel, "{} is now live. Go watch their stream called \"{}\" on {}.".format(stream["username"], stream["title"], stream["url"]))
+                            bot.send_message(channel, "\"{}\" by {} is now live on {}.".format(stream["title"], stream["username"], stream["url"]))
 
             bot.streams = new_streams
         except Exception as error:
