@@ -61,10 +61,11 @@ def on_message(bot, channel, sender, message):
             bot.send_message(channel, "Here's your recording {}.".format(sender))
             bot.send_message(channel, "\"{}\" by {}: {}".format(random_recording["title"], random_recording["username"], random_recording["url"]))
         else:
-            for recording in bot.recordings:
-                if " ".join(message.split()[1:]) in recording["title"].lower():
-                    bot.send_message(channel, "\"{}\" by {}: {}".format(recording["title"], recording["username"], recording["url"]))
-                    break
+            #Search recording
+            matches = [" ".join(message.lower().split()[1:]) in recording["title"].lower() for recording in recordings]
+            if matches:
+                random_match = random.choice(matches)
+                bot.send_message(channel, "\"{}\" by {}: {}".format(random_match["title"], random_match["username"], random_match["url"]))
     elif message.split()[0] == "!upcoming":
         if len(bot.upcoming) > 0:
             bot.send_message(channel, "Here are the upcoming streams {}.".format(sender))
