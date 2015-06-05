@@ -96,7 +96,7 @@ def on_message(bot, channel, sender, message):
 def thread(bot):
     while True:
         try:
-            json_response = requests.get("http://watchpeoplecode.com/json").json()
+            json_response = requests.get("http://watchpeoplecode.com/api/v0/blob").json()
             bot.recordings = json_response["completed"]
             bot.upcoming = json_response["upcoming"]
             new_streams =  json_response["live"]
