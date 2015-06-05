@@ -64,9 +64,9 @@ def on_message(bot, channel, sender, message):
             #Search recording
             matches = []
             for recording in bot.recordings:
-                if " ".join(message.lower().split()[1:] in recording["title"]) or message.lower().split()[1] == recording["username"]:
+                if " ".join(message.lower().split()[1:]) in recording["title"] or message.lower().split()[1] == recording["username"]:
                     matches.append(recording)
-            
+
             if matches:
                 random_match = random.choice(matches)
                 bot.send_message(channel, "\"{}\" by {}: {}".format(random_match["title"], random_match["username"], random_match["url"]))
