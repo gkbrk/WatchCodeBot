@@ -113,7 +113,7 @@ def thread(bot):
 
         if counter % 2 == 0:
             try:
-                json_upcoming = requests.get("http://watchpeoplecode.com/api/v1/streams/live").json()
+                json_upcoming = requests.get("http://watchpeoplecode.com/api/v1/streams/upcoming").json()
                 bot.upcoming = json_upcoming["data"]
             except Exception as error:
                 with open("errorlog.txt", "a") as error_file:
@@ -121,8 +121,8 @@ def thread(bot):
 
         if counter % 10 == 0:
             try:
-                json_upcoming = requests.get("http://watchpeoplecode.com/api/v1/streams/live").json()
-                bot.upcoming = json_upcoming["data"]
+                json_upcoming = requests.get("http://watchpeoplecode.com/api/v1/streams/completed").json()
+                bot.recordings = json_upcoming["data"]
             except Exception as error:
                 with open("errorlog.txt", "a") as error_file:
                     error_file.write("{} {}\n".format(get_date_time(), error))
