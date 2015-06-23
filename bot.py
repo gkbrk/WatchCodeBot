@@ -108,11 +108,11 @@ def thread(bot):
             for stream in new_streams:
                 match_found = False
                 for known_stream in bot.streams:
-                    if stream["title"] == known_stream["title"] and stream["url"] == known_stream["url"] and stream["username"] == known_stream["username"]:
+                    if stream["title"] == known_stream["title"] and stream["url"] == known_stream["url"] and stream["user"] == known_stream["user"]:
                         match_found = True
                 if not match_found:
                     for channel in config["channels"]:
-                        bot.send_message(channel, "\"{}\" by {} is now live on {}.".format(stream["title"], stream["username"], stream["url"]))
+                        bot.send_message(channel, "\"{}\" by {} is now live on {}.".format(stream["title"], stream["user"], stream["url"]))
             
             bot.streams = new_streams
         except Exception as error:
@@ -133,7 +133,7 @@ def thread(bot):
                 bot.upcoming = json_upcoming["data"]
             except Exception as error:
                 with open("errorlog.txt", "a") as error_file:
-                    error_file.write("[{}] {}\n".format(get_date_time(), error))
+                    error_file.write("{} {}\n".format(get_date_time(), error))
         
         counter = (counter % 1000) + 1
         time.sleep(30)
