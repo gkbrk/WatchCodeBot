@@ -99,28 +99,43 @@ def on_message(bot, channel, sender, message):
         bot.send_message(channel, "▄︻̷̿┻̿═━一 {} pew pew".format(message.split()[1]))
 
 def thread(bot):
+    counter = 10 #Get all the documents on startup
     while True:
         try:
-            json_response = requests.get("http://watchpeoplecode.com/api/v0/blob").json()
-            bot.recordings = json_response["completed"]
-            bot.upcoming = json_response["upcoming"]
-            new_streams =  json_response["live"]
+            json_live = requests.get("http://watchpeoplecode.com/api/v1/streams/live").json()
+            new_streams = json_live["data"]
 
             for stream in new_streams:
-                is_match_found = False
+                match_found = False
                 for known_stream in bot.streams:
                     if stream["title"] == known_stream["title"] and stream["url"] == known_stream["url"] and stream["username"] == known_stream["username"]:
-                        is_match_found = True
-                if not is_match_found:
-                    if not bot.muted:
-                        for channel in config["channels"]:
-                            bot.send_message(channel, "\"{}\" by {} is now live on {}.".format(stream["title"], stream["username"], stream["url"]))
-
+                        match_found = True
+                if not match_found:
+                    for channel in config["channels"]:
+                        bot.send_message(channel, "\"{}\" by {} is now live on {}.".format(stream["title"], stream["username"], stream["url"]))
+            
             bot.streams = new_streams
         except Exception as error:
             with open("errorlog.txt", "a") as error_file:
-                error_file.write("{} {}\n".format(get_date_time(), error))
-            bot.send_message("gkbrk", "Help me father! {}".format(error))
+                error_file.write("[{}] {}\n".format(get_date_time(), error))
+
+        if counter % 2 == 0:
+            try:
+                json_upcoming = requests.get("http://watchpeoplecode.com/api/v1/streams/live").json()
+                bot.upcoming = json_upcoming["data"]
+            except Exception as error:
+                with open("errorlog.txt", "a") as error_file:
+                    error_file.write("[{}] {}\n".format(get_date_time(), error))
+
+        if counter % 10 == 0:
+            try:
+                json_upcoming = requests.get("http://watchpeoplecode.com/api/v1/streams/live").json()
+                bot.upcoming = json_upcoming["data"]
+            except Exception as error:
+                with open("errorlog.txt", "a") as error_file:
+                    error_file.write("[{}] {}\n".format(get_date_time(), error))
+        
+        counter = (counter % 1000) + 1
         time.sleep(30)
 
 bot.on_connect.append(on_connect)
