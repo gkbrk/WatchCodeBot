@@ -96,7 +96,7 @@ def thread(bot):
                         match_found = True
                 if not match_found:
                     for channel in config["channels"]:
-                        if stream["username"]:
+                        if stream["user"]:
                             bot.send_message(channel, "\"{}\" by {} is now live on {}.".format(stream["title"], stream["user"], stream["url"]))
                         else:
                             bot.send_message(channel, "\"{}\" is now live on {}.".format(stream["title"], stream["url"]))
